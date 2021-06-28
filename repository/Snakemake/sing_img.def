@@ -1,0 +1,27 @@
+
+Bootstrap: docker
+
+From: continuumio/miniconda3
+
+
+%post
+    /opt/conda/bin/conda create --name rsem-pipeline  bioconda::snakemake-minimal=5.7.0 python=3.6  bioconda::bcftools=1.9  bioconda::star=2.7.5c  bioconda::fastp  bioconda::fastqc=0.11.9 bioconda::rsem=1.3.3 conda-forge::r-base=4.0.2 pandas=1.1.1 bioconda::sra-tools=2.10.8 mcg::libv8
+
+%runscript
+#exec bash
+#source activate rsem-pipeline
+#exec "$@"
+R --slave -e "install.packages('devtools','~/R/x86_64-conda_cos6-linux-gnu-library/4.0')"
+R --slave -e 'install.packages("BiocManager")'
+R --slave -e 'BiocManager::install("limma")'
+R --slave -e 'BiocManager::install("edgeR")'
+R --slave -e 'install.packages("statmod","~/R/x86_64-conda_cos6-linux-gnu-library/4.0")'
+#R --slave -e 'install.packages("rstan")'
+R --slave -e "with_libpaths(new = "~/R/x86_64-conda_cos6-linux-gnu-library/4.0/", install_github('TheJacksonLaboratory/HBA-DEALS'))"
+
+
+
+
+# exec bash
+#conda activate rsem-pipeline
+
