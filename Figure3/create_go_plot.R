@@ -6,11 +6,11 @@ library(ggplot2)
 library(gridExtra)
 library(ggsci)
 
-datasets=c("SRP040070_3","SRP040070_7","SRP040070_9",
+datasets=c("mason_latest","SRP040070_3","SRP040070_7","SRP040070_9",
                            "SRP227272_38",'SRP279203_72','SRP294125_74','SRP284977_77','SRP284977_76',"SRP078309_53","SRP178454_50","SRP186406_51","SRP216763_55","SRP222569_54","SRP251704_52",
-           "SRP273785_56","SRP278618_58") 
+           "SRP273785_56") 
 
-names.all=c('SARS-High-24h','MERS-High-24h','MERS-High-48h','MERS','SARS-COV2(B)',"SARS-COV2(C)",'NSP2','NSP1','Dengue','S.Pneumoniae','HCV','H3N2',"H3N2'",'Zika','RSV','IPSC-NonInfected')
+names.all=c('SARS-COV2(A)','SARS-High-24h','MERS-High-24h','MERS-High-48h','MERS','SARS-COV2(B)',"SARS-COV2(C)",'NSP2','NSP1','Dengue','S.Pneumoniae','HCV','H3N2',"H3N2'",'Zika','RSV')
 
 GO_gp=as.data.frame(matrix(nrow=0,ncol=5,dimnames = list(c(),c("Group","GO_biological_process","Gene_number","Fold_enrichment","FDR" ))))
 
@@ -80,7 +80,7 @@ GO_gp$GO_biological_process<-factor(GO_gp$GO_biological_process,levels=rev(level
 
 # Create a vector with new names for groups to use in the plot
 # Replace the terms by your own (\n allow to start a new line)
-group.labs <- c(`SARS-High-24h` = "SARS-High-24h",
+group.labs <- c(`SARS-COV2(A)`="SARS-COV2(A)",`SARS-High-24h` = "SARS-High-24h",
                 `MERS-High-24h` = "MERS-High-24h",
                 `MERS-High-48h` = "MERS-High-48h",
                 `MERS` = "MERS",
@@ -94,8 +94,7 @@ group.labs <- c(`SARS-High-24h` = "SARS-High-24h",
                  `H3N2`="H3N2",
                  `H3N2'`="H3N2'",
                  `Zika`="Zika",
-                 `RSV`="RSV",
-                 `IPSC-NonInfected`="IPSC-NonInfected"
+                 `RSV`="RSV"
                 )
 
 GO_gp$GO_biological_process=gsub('\\(.*\\)','',GO_gp$GO_biological_process)
