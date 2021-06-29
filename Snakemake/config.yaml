@@ -2,7 +2,7 @@ fastq_dir:
  ./
 
 genome:
- /projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/GRCh38_r91.all
+ star_files/GRCh38_r91.all
 
 gtf:
- /projects/robinson-lab/USERS/karleg/projects/lps/sra/star_files/Homo_sapiens.GRCh38.91.gtf
+ star_files/Homo_sapiens.GRCh38.91.gtf
