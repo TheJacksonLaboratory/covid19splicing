@@ -18,8 +18,7 @@ biosamples=sample_table.BioSample.unique()
 
 rule all:
     input:
-         expand("{dir}/rsem/pe/{samples_pe}/",samples_pe=samples_pe,dir=config["fastq_dir"])
-
+          '../'+str(srp)+'_'+str(cohort)+'.txt'
 
 rule get_fastq_pe:
     output:
@@ -76,41 +75,31 @@ rule prepare_rsem_reference:
 
 rule rsem_calculate_expression_pe:
         input:
-           fq1 = expand("{dir}/trimmed/{{samples_pe}}_1.fastq",dir=config["fastq_dir"]),
-           fq2 = expand("{dir}/trimmed/{{samples_pe}}_2.fastq",dir=config["fastq_dir"]),
+           fq1 = expand("{dir}/trimmed/{samples_pe}_1.fastq",dir=config["fastq_dir"],samples_pe=samples_pe),
+           fq2 = expand("{dir}/trimmed/{samples_pe}_2.fastq",dir=config["fastq_dir"],samples_pe=samples_pe),
            ref = expand("{genome}/rsem_ref/",genome=config["genome"]) 
         output:
-           samp = directory(expand("{dir}/rsem/pe/{{samples_pe}}/",dir=config["fastq_dir"]))
+           samp = expand("{dir}/rsem/pe/{biosamples}/rsem.isoforms.results",biosamples=biosamples,dir=config["fastq_dir"])
         log:
-           log=expand("logs/rsem/rsem_expression_{{samples_pe}}.log")
+           log=expand("logs/rsem/rsem_expression_log.log")
         threads:
-           32
+           4
         run:
-           for val in sample_table.BioSample.unique():
-               if os.path.exists(dir+'/rsem/pe/'+val+'/rsem.isoforms.results'):
-                    continue
-               fastq_files=sample_table.index.values[sample_table['BioSample']==val]
-               fastq_string1=''
-               fastq_string2=''
-               wait_next=False
-               for file in fastq_files:
-                    if os.path.exists(dir+'/trimmed/'+file+'_1.fastq'):
-                    	fastq_string1=fastq_string1+dir+'/trimmed/'+file+'_1.fastq '
-                    	fastq_string2=fastq_string2+dir+'/trimmed/'+file+'_2.fastq '
-                    else:
-                        wait_next=True
-                        break
-               if wait_next:
-                        break
-               shell('cat '+fastq_string1+' > '+dir+'/trimmed/'+val+'_1.fastq')
-               shell('cat '+fastq_string2+' > '+dir+'/trimmed/'+val+'_2.fastq')
-               shell('mkdir '+dir+'/rsem/pe/'+val)
-               shell("rsem-calculate-expression --star --paired-end --no-bam-output --num-threads {threads} "+dir+"/trimmed/"+val+"_1.fastq "+dir+"/trimmed/"+val+"_2.fastq"+ " {input.ref}rsem "+dir+'/rsem/pe/'+val+"/rsem")
+            for val in biosamples:
+                srrs=sample_table.index.values[sample_table['BioSample']==val]
+                fastq_string1=''
+                fastq_string2=''
+                for file in srrs:
+                        fastq_string1=fastq_string1+dir+'/trimmed/'+file+'_1.fastq '
+                        fastq_string2=fastq_string2+dir+'/trimmed/'+file+'_2.fastq '
+                shell('cat '+fastq_string1+' > '+dir+'/trimmed/'+val+'_1.fastq')
+                shell('cat '+fastq_string2+' > '+dir+'/trimmed/'+val+'_2.fastq')
+                shell("rsem-calculate-expression --star --paired-end --no-bam-output --num-threads {threads} "+dir+"/trimmed/"+val+"_1.fastq "+dir+"/trimmed/"+val+"_2.fastq"+ " {input.ref}rsem "+dir+'/rsem/pe/'+val+"/rsem")
 
 rule run_hbadeals:
         threads: 32
         input:
-          samp = expand("{dir}/rsem/pe/{samples_pe}/",dir=config["fastq_dir"],samples_pe=samples_pe)
+          samp = expand("{dir}/rsem/pe/{biosamples}/rsem.isoforms.results",biosamples=biosamples,dir=config["fastq_dir"])
         output:
           '../'+str(srp)+'_'+str(cohort)+'.txt'
         params:
